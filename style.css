@@ -1,0 +1,77 @@
+/* General */
+input{
+    margin: 10px;
+    font-size: 20px;
+    width:173px;
+}
+
+body{
+    background: rgb(240, 240, 255);
+}
+
+/* Class */
+
+.tracks-list-track{
+    width: 100%;
+    display: flex;
+    margin-bottom: 10px;
+    border-style: solid;
+    background: rgb(226, 220, 220);
+}
+
+.label{
+    padding: 10px;
+    font-size: large;
+    color: black;
+}
+
+.large-button{
+    cursor: pointer;
+    background: rgb(177, 173, 173);
+    padding: 10px;
+    text-align: -webkit-center;
+    color: white;
+    font-size: 50px;
+    border-radius: 40px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.large-button:hover{
+    background: rgb(127, 123, 123);
+}
+
+.small-button{
+    cursor: pointer;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-left: auto;
+    line-height: 70px;
+    border-style: outset;
+    background: floralwhite;
+    display: inline;
+}
+
+.small-button:hover{
+    background: white;
+}
+
+.noselect{
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
+/* ID */
+#tracks-list{
+    padding: 0px;
+}
+
+#tracks-metadata-container{
+    display: flex;
+}
