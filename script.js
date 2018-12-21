@@ -62,13 +62,13 @@ let createLabelInputTime = function(labelString, callback, initValue){
 }
 
 //track obj
-let newTrackObj = function(index, start){
+let newTrackObj = function(index, start, artist, title){
 
     return {
         //attr
         index: index,
-        title:"",
-        artist:"",
+        title: title,
+        artist: artist,
         start:start,
         end:start,
         html: null
@@ -315,7 +315,7 @@ addButton.onclick = function(evt){
     let endPrevious = defaultTime
     if(previousTrack) endPrevious = previousTrack.end
 
-    let trackObj = newTrackObj(playlist.tracks.length + 1, endPrevious)
+    let trackObj = newTrackObj(playlist.tracks.length + 1, endPrevious, "", "")
 
     createTrackDiv(playlist, trackObj)
 
@@ -336,6 +336,18 @@ saveButton.onclick = function(evt){
     a.click();
 }
 
+let loadPlaylist = function(playlist){
+    //update ui from playlist
+    playlist.tracks.forEach(function(track){
+        createTrackDiv(playlist, track)
+    });
+
+    inputTitle.value = playlist.title
+    inputFitContent(inputTitle)
+
+    onDataChanged(playlist)
+}
+
 let readSingleFile = function(e) {
 
     var file = e.target.files[0];
@@ -353,19 +365,48 @@ let readSingleFile = function(e) {
             list.removeChild(list.firstChild);
         }
 
-        //update ui from playlist
-        playlist.tracks.forEach(function(track){
-            createTrackDiv(playlist, track)
-        });
-
-        debugger
-        inputTitle.value = playlist.title
-        inputFitContent(inputTitle)
-
-        generateDescription(playlist)
+        loadPlaylist(playlist)
+       
     };
     reader.readAsText(file);
 }
 
-let fileInput = document.getElementById('tracks-open')
-fileInput.addEventListener('change', readSingleFile, false);
+let fileInput = document.getElementById("tracks-open")
+fileInput.addEventListener('change', readSingleFile, false)
+
+let generatePlaylistFromFiles = function(e){
+    let files = e.target.files
+    if(!files.length) return
+
+    //clean ui
+    let list = document.getElementById("tracks-list")
+    while (list.firstChild) {
+        list.removeChild(list.firstChild);
+    }
+
+    playlist.title = ""
+    playlist.tracks = []
+
+    for(let i = 0 ; i < files.length; i++){
+        let nameFile = files[i].name
+        let indexPoint = nameFile.indexOf('.')
+        nameFile = nameFile.substring(0, indexPoint != -1 ? indexPoint : nameFile.length)
+        //pattern is => index - artist - song title
+        array = nameFile.split('-')
+
+        let index = array[0] || i
+        let artist = array[1] || ""
+        let songTitle = array[2] || ""
+        index = index.trim()
+        artist = artist.trim()
+        songTitle = songTitle.trim()
+
+        let trackObj = newTrackObj(index, defaultTime, artist, songTitle)
+        playlist.tracks.push(trackObj)
+    }
+
+    loadPlaylist(playlist)
+}
+
+let generateDataInputs = document.getElementById("tracks-generate")
+generateDataInputs.addEventListener('change', generatePlaylistFromFiles, false)
