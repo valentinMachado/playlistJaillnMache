@@ -8,6 +8,67 @@
 console.log("Playlist-tool start")
 
 //Helpers
+
+// Time
+let ms2Time = function(value){
+
+    let result = {
+        sec: 0,
+        min: 0,
+        hour: 0
+    }
+
+    //value is ms
+    value /= 1000
+    //value is sec
+    result.hour = Math.floor(value/3600)
+    value -= result.hour * 3600
+    result.min = Math.floor(value/60)
+    value -= result.min * 60
+    result.sec = value
+
+    return result
+}
+
+let time2Ms = function(value){
+    return 1000 * (value.hour * 3600 + value.min * 60 + value.sec)
+}
+
+let time2String = function(time){
+    let result = ""
+    if(time.hour < 10){
+        result += "0"+time.hour
+    }else{
+        result += time.hour
+    }
+    result += ":"
+
+    if(time.min < 10){
+        result += "0"+time.min
+    }else{
+        result += time.min
+    }
+    result += ":"
+
+    if(time.sec < 10){
+        result += "0"+time.sec
+    }else{
+        result += time.sec
+    }
+
+    return result
+}
+
+let ms2String = function(ms){
+  return time2String(ms2Time(ms))
+}
+
+let defaultTime = {
+    hour:0,
+    min:0,
+    sec:0
+}
+
 let inputFitContent = function(input){
     input.style.width = Math.max( ((input.value.length + 1) * 10), 173) + "px"
 }
@@ -22,15 +83,15 @@ let createLabelDiv = function(labelString){
 
 //return a div containing a label + inpu
 let createLabelInputText = function(labelString, initValue, callback){
-    
+
     let label = createLabelDiv(labelString)
-    
+
     let input = document.createElement("input")
     input.type = "text"
     input.onkeypress = callback
     input.onchange = callback
     input.value = initValue
-    
+
     let container = document.createElement("div")
     container.appendChild(label)
     container.appendChild(input)
@@ -41,24 +102,56 @@ let createLabelInputText = function(labelString, initValue, callback){
 }
 
 let createLabelInputTime = function(labelString, callback, initValue){
-    
+
     let label = createLabelDiv(labelString)
-    
+
     let input = document.createElement("input")
     input.type = "time"
     input.step = 1 //force sec to appear
     if(initValue){
         input.value = initValue
     }else{
-        input.value = "00:00:00"
+        input.value = time2String(defaultTime)
     }
     input.onchange = callback
-    
+
     let container = document.createElement("div")
     container.appendChild(label)
     container.appendChild(input)
 
+    //reset
+    container.reset = function(){
+      input.value = time2String(defaultTime)
+    }
+
     return container
+}
+
+let createCalculator = function(){
+
+  let parent = document.createElement("div")
+
+  let sumMs = 0
+  let ms2Label = function(ms){
+    return "Somme: " + ms2String(ms)
+  }
+  let sumTimeLabel = createLabelDiv(ms2Label(sumMs))
+
+  let inputDiv = createLabelInputTime("Temps à ajouter",function(){})
+
+  inputDiv.onkeypress = function(evt){
+
+    if(evt.keyCode === 13){
+      sumMs += evt.target.valueAsNumber
+      sumTimeLabel.innerHTML = ms2Label(sumMs)
+      inputDiv.reset()
+    }
+  }
+
+  parent.appendChild(inputDiv)
+  parent.appendChild(sumTimeLabel)
+
+  return parent
 }
 
 //track obj
@@ -84,7 +177,7 @@ let computeDurationString = function(trackObj){
 }
 
 let createTrackDiv = function(playlist, trackObj){
-    
+
     //list
     let list = document.getElementById("tracks-list")
 
@@ -100,7 +193,7 @@ let createTrackDiv = function(playlist, trackObj){
         onDataChanged(playlist)
     }
     let artistDiv = createLabelInputText("Artiste", trackObj.artist, cbArtist)
-    
+
     //title
     let cbTitle = function(evt){
         trackObj.title = evt.target.value
@@ -108,7 +201,7 @@ let createTrackDiv = function(playlist, trackObj){
         onDataChanged(playlist)
     }
     let titleDiv = createLabelInputText("Titre", trackObj.title, cbTitle)
-    
+
     //duration
     let infoDuration = createLabelDiv("")
     infoDuration.innerHTML = computeDurationString(trackObj)
@@ -120,7 +213,7 @@ let createTrackDiv = function(playlist, trackObj){
         onDataChanged(playlist)
     }
     let startTimeDiv = createLabelInputTime("Commence à", cbStart,time2String(trackObj.start))
-    
+
     //endTime
     let cbEnd = function(evt){
         trackObj.end = ms2Time(evt.target.valueAsNumber)
@@ -155,7 +248,7 @@ let createTrackDiv = function(playlist, trackObj){
 
         onDataChanged(playlist)
     }
-    
+
     //add to parent
     trackDiv.appendChild(infoIndex)
     trackDiv.appendChild(artistDiv)
@@ -173,7 +266,7 @@ let saveTolocalStorage = function(playlist){
     localStorage.setItem("playlist", JSON.stringify(playlist))
 }
 
-let metadataDiv = document.getElementById("tracks-metadata-container") 
+let metadataDiv = document.getElementById("tracks-metadata-container")
 let descriptionDiv = document.createElement("div")
 metadataDiv.appendChild(descriptionDiv)
 let generateDescription = function(playlist){
@@ -200,7 +293,7 @@ let loadFromLocalStorage = function(){
     }
 
     if(!playlist){//} || !confirm("Charger la derniere playlist ?")){
-        
+
         playlist = {
             title:"",
             tracks: []
@@ -218,63 +311,10 @@ let loadFromLocalStorage = function(){
     return playlist
 }
 
-// Time
-let ms2Time = function(value){
-    
-    let result = {
-        sec: 0,
-        min: 0,
-        hour: 0
-    }
-    
-    //value is ms
-    value /= 1000
-    //value is sec
-    result.hour = Math.floor(value/3600)
-    value -= result.hour * 3600
-    result.min = Math.floor(value/60)
-    value -= result.min * 60
-    result.sec = value
-    
-    return result
-}
-
-let time2Ms = function(value){
-    return 1000 * (value.hour * 3600 + value.min * 60 + value.sec)
-}
-
-let time2String = function(time){
-    let result = ""
-    if(time.hour < 10){
-        result += "0"+time.hour
-    }else{
-        result += time.hour
-    }
-    result += ":"
-    
-    if(time.min < 10){
-        result += "0"+time.min
-    }else{
-        result += time.min
-    }
-    result += ":"
-    
-    if(time.sec < 10){
-        result += "0"+time.sec
-    }else{
-        result += time.sec
-    }
-
-    return result
-}
-
-let defaultTime = {
-    hour:0,
-    min:0,
-    sec:0
-}
-
 // Main
+let calculator = createCalculator()
+console.log(calculator)
+document.body.appendChild(calculator)
 
 let playlist = loadFromLocalStorage()
 
@@ -366,7 +406,7 @@ let readSingleFile = function(e) {
         }
 
         loadPlaylist(playlist)
-       
+
     };
     reader.readAsText(file);
 }
