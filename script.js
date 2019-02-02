@@ -148,8 +148,20 @@ let createCalculator = function(){
     }
   }
 
+  // reset button
+  let resetButton = document.createElement("div")
+  resetButton.innerHTML = "Reset Somme"
+  resetButton.classList.add("noselect")
+  resetButton.classList.add("small-button")
+  resetButton.onclick = function(evt){
+    inputDiv.reset()
+    sumTimeLabel.innerHTML = ms2Label(0)
+    sumMs = 0
+  }
+
   parent.appendChild(inputDiv)
   parent.appendChild(sumTimeLabel)
+  parent.appendChild(resetButton)
 
   return parent
 }
