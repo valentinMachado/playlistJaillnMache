@@ -313,7 +313,6 @@ let loadFromLocalStorage = function(){
 
 // Main
 let calculator = createCalculator()
-console.log(calculator)
 document.body.appendChild(calculator)
 
 let playlist = loadFromLocalStorage()
