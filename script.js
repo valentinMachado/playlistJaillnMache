@@ -282,7 +282,7 @@ let metadataDiv = document.getElementById("tracks-metadata-container")
 let descriptionDiv = document.createElement("div")
 metadataDiv.appendChild(descriptionDiv)
 let generateDescription = function(playlist){
-    let description = "Les playlist du jailln et de la mache - Every month a playlist on a particular theme or music genre."
+    let description = "Les playlist du jailln et de la mache - Playlist on a particular theme or music genre."
     description += "<br/><br/>"
     description += playlist.title + " Playlist"
     description += "<br/><br/>"
